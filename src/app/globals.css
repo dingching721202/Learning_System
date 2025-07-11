@@ -1,26 +1,510 @@
+/* 深色模式下月曆格子內待辦 hover/active 顏色加強可讀性 */
+.dark .calendar-todo-dot:hover,
+.dark .calendar-todo-dot:focus {
+  background: #334155 !important;
+  color: #fff !important;
+  border-color: #60a5fa !important;
+  box-shadow: 0 2px 8px 0 #0004;
+}
+/* 年/十年/世紀選擇視圖 tile 文字置中（強制寬高與置中） */
+.react-calendar__year-view .react-calendar__tile,
+.react-calendar__decade-view .react-calendar__tile,
+.react-calendar__century-view .react-calendar__tile {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  font-weight: 600;
+  height: 100% !important;
+  width: 100% !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  min-height: 4.5rem !important;
+  min-width: 4.5rem !important;
+  box-sizing: border-box;
+}
+/* 年/十年/世紀選擇視圖 tile 文字置中 */
+.react-calendar__year-view .react-calendar__tile,
+.react-calendar__decade-view .react-calendar__tile,
+.react-calendar__century-view .react-calendar__tile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-weight: 600;
+}
+/* react-calendar 年/十年/世紀選擇視圖深色模式支援 */
+.dark .react-calendar__year-view,
+.dark .react-calendar__decade-view,
+.dark .react-calendar__century-view {
+  background: #23232b !important;
+  color: #e0e6ed !important;
+}
+.dark .react-calendar__year-view .react-calendar__tile,
+.dark .react-calendar__decade-view .react-calendar__tile,
+.dark .react-calendar__century-view .react-calendar__tile {
+  background: #23232b !important;
+  color: #e0e6ed !important;
+  border-radius: 1.25rem !important;
+}
+.dark .react-calendar__year-view .react-calendar__tile:enabled:hover,
+.dark .react-calendar__decade-view .react-calendar__tile:enabled:hover,
+.dark .react-calendar__century-view .react-calendar__tile:enabled:hover {
+  background: #334155 !important;
+  color: #fff !important;
+}
+.dark .react-calendar__navigation {
+  background: #23232b !important;
+  color: #e0e6ed !important;
+}
+.dark .react-calendar__navigation button {
+  background: #23232b !important;
+  color: #e0e6ed !important;
+  border-radius: 0.75rem !important;
+}
+.dark .react-calendar__navigation button:enabled:hover {
+  background: #334155 !important;
+  color: #fff !important;
+}
+/* 今日日期格子淡藍色背景 */
+.calendar-today {
+  background: #e3f2fd !important;
+  /* 可依設計調整 */
+  border-radius: 0.5em;
+  border: 2px solid #42a5f5;
+  box-sizing: border-box;
+}
+/* 月曆格子內待辦事項圓框樣式 */
+/* 每個待辦事項單獨一列，+N 也單獨一列 */
+.calendar-todo-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.18em;
+  flex-wrap: nowrap;
+  margin-top: 0.1em;
+  align-items: stretch;
+}
+/* 橫向長方形、圓角、淺藍底 */
+.calendar-todo-dot {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  min-width: 2.6em;
+  min-height: 1.6em;
+  /* 讓圓角框寬度最大化利用格子，短字自動收窄，長字超出才省略 */
+  width: fit-content;
+  max-width: 100%;
+  min-width: 2.6em;
+  align-self: flex-start;
+  border-radius: 0.8em;
+  background: #e8f5e9;
+  color: #22223b;
+  font-size: 0.92em;
+  font-weight: 500;
+  border: 1.5px solid #66bb6a;
+  box-sizing: border-box;
+  padding: 0 0.4em;
+  /* 讓內容自動延展，僅超出格子寬度時才省略 */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: box-shadow 0.15s;
+}
+.dark .calendar-todo-dot {
+  background: #1b2e1b;
+  color: #fff;
+  border-color: #388e3c;
+}
+
+/* 已完成待辦在月曆格子內的樣式 */
+.calendar-todo-dot.completed {
+  opacity: 0.6;
+  filter: grayscale(1);
+  text-decoration: line-through;
+  color: #b0b0b0;
+}
+/* +N亮紅色、橫向長方形、圓角 */
+.calendar-todo-more {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  min-width: 2.6em;
+  min-height: 1.6em;
+  /* 讓+N寬度最大化利用格子，短字自動收窄，長字超出才省略 */
+  width: fit-content;
+  max-width: 100%;
+  align-self: stretch;
+  border-radius: 0.8em;
+  background: #ffeaea;
+  color: #ff1744;
+  font-size: 0.92em;
+  font-weight: 400;
+  border: 1.5px solid #ff1744;
+  box-sizing: border-box;
+  padding: 0 0.7em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: box-shadow 0.15s;
+}
+.dark .calendar-todo-more {
+  background: #3a2a2a;
+  color: #ff5252;
+  border-color: #ff5252;
+}
+/* 月曆格子內所有內容（含 .calendar-todo）皆置左 */
+.rwd-calendar .react-calendar__tile {
+  text-align: left !important;
+}
+
+.rwd-calendar .calendar-todo {
+  text-align: left !important;
+}
+/* 強化 destructive 按鈕紅色表現，確保所有情境都明顯紅色 */
+/* destructive 按鈕：無背景，紅色文字，hover/active 更深紅 */
+.bg-destructive,
+button.bg-destructive,
+button[data-variant="destructive"],
+button.variant-destructive {
+  background: none !important;
+  background-color: transparent !important;
+  color: #e53935 !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.bg-destructive:hover,
+button.bg-destructive:hover,
+button[data-variant="destructive"]:hover,
+button.variant-destructive:hover {
+  color: #b71c1c !important;
+  background: none !important;
+  background-color: transparent !important;
+}
+
+.dark .bg-destructive,
+.dark button.bg-destructive,
+.dark button[data-variant="destructive"],
+.dark button.variant-destructive {
+  color: #ff6b6b !important;
+  background: none !important;
+  background-color: transparent !important;
+}
+
+.dark .bg-destructive:hover,
+.dark button.bg-destructive:hover,
+.dark button[data-variant="destructive"]:hover,
+.dark button.variant-destructive:hover {
+  color: #ff1744 !important;
+  background: none !important;
+  background-color: transparent !important;
+}
 @import "tailwindcss";
+@import "tw-animate-css";
+
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --radius: 0.625rem;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.922 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.556 0 0);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+
+*, *:before, *:after {
+  border-color: var(--border);
 }
 
+/* 僅針對互動元件移除 outline，保留無障礙 */
+button:focus,
+.calendar-todo-dot:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px #90caf9;
+}
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  transition: background 0.3s, color 0.3s;
+}
+
+.dark body, .dark {
+  color: #e0e6ed !important;
+  background: #18181b !important;
+}
+/* Calendar 深色模式加強 */
+.dark .rwd-calendar {
+  background: #18181b !important;
+}
+.dark .bg-white, .dark .bg-gray-900, .dark .unscheduled-todos-bg {
+  background: #23232b !important;
+  color: #e0e6ed !important;
+  border-color: #333 !important;
+}
+.dark .unscheduled-todos-title, .dark .unscheduled-todos-empty {
+  color: #b0b8c9 !important;
+}
+.dark .rwd-calendar .react-calendar__tile {
+  background: #23232b !important;
+  color: #e0e6ed !important;
+}
+.dark .rwd-calendar .react-calendar__tile > abbr {
+  color: #e0e6ed !important;
+}
+.dark .text-gray-400 {
+  color: #b0b8c9 !important;
+}
+.dark .text-gray-500 {
+  color: #a0aec0 !important;
+}
+.dark .text-gray-600 {
+  color: #cbd5e1 !important;
+}
+.dark .text-black {
+  color: #e0e6ed !important;
+}
+.dark .text-blue-500 {
+  color: #60a5fa !important;
+}
+.dark .text-blue-600 {
+  color: #3b82f6 !important;
+}
+.dark .text-xs {
+  color: #b0b8c9 !important;
+}
+.dark .font-semibold {
+  font-weight: 600 !important;
+}
+.dark .font-medium {
+  font-weight: 500 !important;
+}
+.dark .calendar-today {
+  background: #223355 !important;
+  border: 2px solid #60a5fa !important;
+}
+.dark .calendar-todo-dot {
+  background: #1b2e1b !important;
+  color: #e0e6ed !important;
+  border-color: #388e3c !important;
+}
+.dark .calendar-todo-dot.completed {
+  color: #888 !important;
+}
+.dark .calendar-todo-more {
+  background: #3a2a2a !important;
+  color: #ff5252 !important;
+  border-color: #ff5252 !important;
+}
+.dark .DialogContent, .dark .dialog-content {
+  background: #18181b !important;
+  color: #e0e6ed !important;
+}
+.dark .DialogContent *, .dark .dialog-content * {
+  background: #18181b !important;
+  color: #e0e6ed !important;
+}
+.dark .bg-background {
+  background-color: #18181b !important;
+  color: #e0e6ed !important;
+}
+/* 搜尋/過濾列深色 */
+.dark input[type="text"], .dark input[type="search"] {
+  background: #23232b !important;
+  color: #e0e6ed !important;
+  border-color: #444 !important;
+}
+input[type="text"], input[type="search"] {
+  background: #fff !important;
+  color: #22223b !important;
+  border-color: #d1d5db !important;
+}
+input[type="text"]::placeholder, input[type="search"]::placeholder {
+  color: #888 !important;
+  opacity: 1;
+}
+.dark input[type="text"]::placeholder, .dark input[type="search"]::placeholder {
+  color: #b0b8c9 !important;
+  opacity: 1;
+}
+.dark .bg-blue-500 {
+  background: #223355 !important;
+  color: #e0e6ed !important;
+  border-color: #334155 !important;
+}
+.dark .bg-blue-500:hover {
+  background: #334155 !important;
+}
+
+/* 桌面板 1920x1080，月曆最大寬度 1200px，置中顯示 */
+.rwd-calendar {
+  width: 100%;
+  max-width: 1200px;
+  min-width: 900px;
+  margin: 0px auto 0 auto;
+  /* 上方留白 32px，視覺更完整 */
+}
+.rwd-calendar .react-calendar__month-view {
+  width: 100%;
+  min-width: 0;
+}
+.rwd-calendar .react-calendar__tile {
+  width: calc(100% / 7);
+  aspect-ratio: 1/1;
+  height: auto !important;
+  min-height: 3.2rem !important;
+  max-height: 7rem !important;
+  font-size: 1rem;
+  letter-spacing: 0.01em;
+  padding: 4px 4px 0 4px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  position: relative;
+  overflow: hidden;
+}
+/* 讓日期數字置頂，並加強樣式 */
+/* 日期數字置中，其他內容仍置左 */
+.rwd-calendar .react-calendar__tile > abbr {
+  display: block;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #22223b;
+  margin-bottom: 0.2rem;
+  letter-spacing: 0.01em;
+  line-height: 1.2;
+  text-align: center;
+}
+@media (max-width: 900px) {
+  .rwd-calendar .react-calendar__tile > abbr {
+    font-size: 0.95rem;
+  }
+}
+@media (max-width: 640px) {
+  .rwd-calendar .react-calendar__tile > abbr {
+    font-size: 0.85rem;
+  }
+}
+@media (max-width: 1300px) {
+  .rwd-calendar {
+    max-width: 100vw;
+    min-width: 0;
+  }
+  .rwd-calendar .react-calendar__tile {
+    font-size: 0.95rem;
+    min-height: 2.5rem !important;
+    max-height: 4.2rem !important;
+    padding: 2px 2px 0 2px;
+  }
+}
+@media (max-width: 640px) {
+  .rwd-calendar {
+    max-width: 100vw;
+  }
+  .rwd-calendar .react-calendar__tile {
+    font-size: 0.85rem;
+    min-height: 2rem !important;
+    max-height: 3.2rem !important;
+    padding: 1px 1px 0 1px;
+  }
+}
+
+/* 強制 Dialog 彈窗白底、內容不透明、去除過度透明與毛玻璃 */
+.DialogContent, .dialog-content {
+  background: #fff !important;
+  color: #22223b !important;
+  border-radius: 1rem !important;
+  box-shadow: 0 8px 40px 0 rgba(0,0,0,0.18);
+  opacity: 1 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+.DialogContent *, .dialog-content * {
+  background: #fff !important;
+  color: #22223b !important;
+  opacity: 1 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+@media (prefers-color-scheme: dark) {
+  .DialogContent, .dialog-content {
+    background: #18181b !important;
+    color: #fff !important;
+  }
+  .DialogContent *, .dialog-content * {
+    background: #18181b !important;
+    color: #fff !important;
+  }
+}
+
+/* 強制 Dialog 彈窗 .bg-background 為白底（深色模式為深色） */
+.bg-background {
+  background-color: #fff !important;
+}
+@media (prefers-color-scheme: dark) {
+  .bg-background {
+    background-color: #18181b !important;
+  }
 }

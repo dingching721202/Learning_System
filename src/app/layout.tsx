@@ -27,8 +27,17 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        {/* 全域 TodoProvider 包裹 App */}
+        <Providers>
+          {children}
+        </Providers>
       </body>
     </html>
   );
+}
+
+// Providers: 全域 Context
+import { TodoProvider } from "@/context/TodoContext";
+function Providers({ children }: { children: React.ReactNode }) {
+  return <TodoProvider>{children}</TodoProvider>;
 }
