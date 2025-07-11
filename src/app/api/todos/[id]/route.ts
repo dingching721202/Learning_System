@@ -3,8 +3,8 @@ import { Todo } from '@/types/todo';
 import { getTodoById, updateTodo, patchTodo, deleteTodo } from '@/app/api/todos/todoStore';
 
 // GET /api/todos/[id]
-export async function GET(request: Request, { params }: { params: { id: string } }) {
-  const { id } = params;
+export async function GET(request: Request, {params}: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const todo = getTodoById(id);
 
   if (todo) {
@@ -15,8 +15,8 @@ export async function GET(request: Request, { params }: { params: { id: string }
 }
 
 // PUT /api/todos/[id] (Full update)
-export async function PUT(request: Request, { params }: { params: { id: string } }) {
-  const { id } = params;
+export async function PUT(request: Request, {params}: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const updatedTodoData: Todo = await request.json();
   const updated = updateTodo(id, updatedTodoData);
 
@@ -28,8 +28,8 @@ export async function PUT(request: Request, { params }: { params: { id: string }
 }
 
 // PATCH /api/todos/[id] (Partial update)
-export async function PATCH(request: Request, { params }: { params: { id: string } }) {
-  const { id } = params;
+export async function PATCH(request: Request, {params}: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const partialUpdate: Partial<Todo> = await request.json();
   const updated = patchTodo(id, partialUpdate);
 
@@ -41,8 +41,8 @@ export async function PATCH(request: Request, { params }: { params: { id: string
 }
 
 // DELETE /api/todos/[id]
-export async function DELETE(request: Request, { params }: { params: { id: string } }) {
-  const { id } = params;
+export async function DELETE(request: Request, {params}: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const deleted = deleteTodo(id);
 
   if (deleted) {
