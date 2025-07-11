@@ -1,42 +1,24 @@
 "use client";
-import React, { createContext, useReducer, useContext, Dispatch, ReactNode, useEffect } from "react";
+import React, { createContext, useReducer, useContext, ReactNode, useEffect, useCallback, useMemo } from "react";
 import { Todo } from "@/types/todo";
-import { sampleTodos } from "@/types/sampleTodos";
 
 // Action Types
 export type TodoAction =
-  | { type: "ADD_TODO"; payload: Omit<Todo, "id" | "createdAt" | "updatedAt"> }
-  | { type: "EDIT_TODO"; payload: Todo }
-  | { type: "DELETE_TODO"; payload: string }
-  | { type: "TOGGLE_TODO"; payload: string }
-  | { type: "INIT_TODOS"; payload: Todo[] };
+  | { type: "SET_TODOS"; payload: Todo[] };
+
+// Define the type for the dispatch functions that will interact with the API
+export type TodoDispatch = {
+  addTodo: (newTodoData: Omit<Todo, "id" | "createdAt" | "updatedAt" | "completed">) => Promise<void>;
+  editTodo: (updatedTodo: Todo) => Promise<void>;
+  deleteTodo: (id: string) => Promise<void>;
+  toggleTodo: (id: string) => Promise<void>;
+};
 
 // Reducer
 function todoReducer(state: Todo[], action: TodoAction): Todo[] {
   switch (action.type) {
-    case "INIT_TODOS":
+    case "SET_TODOS":
       return action.payload;
-    case "ADD_TODO": {
-      const now = new Date().toISOString();
-      const newTodo: Todo = {
-        ...action.payload,
-        id: crypto.randomUUID(),
-        completed: false,
-        createdAt: now,
-        updatedAt: now,
-      };
-      return [newTodo, ...state];
-    }
-    case "EDIT_TODO":
-      return state.map(todo =>
-        todo.id === action.payload.id ? { ...action.payload, updatedAt: new Date().toISOString() } : todo
-      );
-    case "DELETE_TODO":
-      return state.filter(todo => todo.id !== action.payload);
-    case "TOGGLE_TODO":
-      return state.map(todo =>
-        todo.id === action.payload ? { ...todo, completed: !todo.completed, updatedAt: new Date().toISOString() } : todo
-      );
     default:
       return state;
   }
@@ -44,36 +26,118 @@ function todoReducer(state: Todo[], action: TodoAction): Todo[] {
 
 // Context
 const TodoStateContext = createContext<Todo[] | undefined>(undefined);
-const TodoDispatchContext = createContext<Dispatch<TodoAction> | undefined>(undefined);
+const TodoDispatchContext = createContext<TodoDispatch | undefined>(undefined);
 
 export const TodoProvider = ({ children }: { children: ReactNode }) => {
   const [state, dispatch] = useReducer(todoReducer, []);
 
-  // 初始化 sample data 或 localStorage
-  useEffect(() => {
-    const local = typeof window !== "undefined" ? localStorage.getItem("todos") : null;
-    if (local) {
-      try {
-        const parsed = JSON.parse(local);
-        dispatch({ type: "INIT_TODOS", payload: parsed });
-      } catch {
-        dispatch({ type: "INIT_TODOS", payload: sampleTodos });
+  // Function to fetch todos from API and update state
+  const fetchTodos = useCallback(async () => {
+    try {
+      const response = await fetch('/api/todos');
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
-    } else {
-      dispatch({ type: "INIT_TODOS", payload: sampleTodos });
+      const data: Todo[] = await response.json();
+      dispatch({ type: "SET_TODOS", payload: data });
+    } catch (error) {
+      console.error("Failed to fetch todos:", error);
+      // Fallback to localStorage if API fails on initial load
+      const local = typeof window !== "undefined" ? localStorage.getItem("todos") : null;
+      if (local) {
+        try {
+          const parsed = JSON.parse(local);
+          dispatch({ type: "SET_TODOS", payload: parsed });
+        } catch (e) {
+          console.error("Failed to parse localStorage todos:", e);
+          dispatch({ type: "SET_TODOS", payload: [] }); // Fallback to empty array
+        }
+      } else {
+        dispatch({ type: "SET_TODOS", payload: [] }); // Fallback to empty array
+      }
     }
   }, []);
 
-  // 同步 localStorage
+  // Initial load from API or localStorage
+  useEffect(() => {
+    fetchTodos();
+  }, [fetchTodos]);
+
+  // Sync localStorage whenever state changes
   useEffect(() => {
     if (typeof window !== "undefined") {
       localStorage.setItem("todos", JSON.stringify(state));
     }
   }, [state]);
 
+  // API interaction functions
+  const addTodo = useCallback(async (newTodoData: Omit<Todo, "id" | "createdAt" | "updatedAt" | "completed">) => {
+    try {
+      const response = await fetch('/api/todos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newTodoData),
+      });
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      await fetchTodos(); // Re-fetch all todos to update state
+    } catch (error) {
+      console.error("Failed to add todo:", error);
+    }
+  }, [fetchTodos]);
+
+  const editTodo = useCallback(async (updatedTodo: Todo) => {
+    try {
+      const response = await fetch(`/api/todos/${updatedTodo.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedTodo),
+      });
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      await fetchTodos();
+    } catch (error) {
+      console.error("Failed to edit todo:", error);
+    }
+  }, [fetchTodos]);
+
+  const deleteTodo = useCallback(async (id: string) => {
+    try {
+      const response = await fetch(`/api/todos/${id}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      await fetchTodos();
+    } catch (error) {
+      console.error("Failed to delete todo:", error);
+    }
+  }, [fetchTodos]);
+
+  const toggleTodo = useCallback(async (id: string) => {
+    const todoToToggle = state.find(todo => todo.id === id);
+    if (!todoToToggle) return;
+
+    try {
+      const response = await fetch(`/api/todos/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ completed: !todoToToggle.completed }),
+      });
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      await fetchTodos();
+    } catch (error) {
+      console.error("Failed to toggle todo:", error);
+    }
+  }, [state, fetchTodos]);
+
+  const todoDispatch: TodoDispatch = useMemo(() => ({
+    addTodo,
+    editTodo,
+    deleteTodo,
+    toggleTodo,
+  }), [addTodo, editTodo, deleteTodo, toggleTodo]);
+
   return (
     <TodoStateContext.Provider value={state}>
-      <TodoDispatchContext.Provider value={dispatch}>
+      <TodoDispatchContext.Provider value={todoDispatch}>
         {children}
       </TodoDispatchContext.Provider>
     </TodoStateContext.Provider>
@@ -85,6 +149,7 @@ export function useTodoState() {
   if (context === undefined) throw new Error("useTodoState must be used within a TodoProvider");
   return context;
 }
+
 export function useTodoDispatch() {
   const context = useContext(TodoDispatchContext);
   if (context === undefined) throw new Error("useTodoDispatch must be used within a TodoProvider");
